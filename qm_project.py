@@ -32,7 +32,21 @@ def orb(ao_index):
     return orbital_types[orb_index]
 
 def ao_index(atom_p, orb_p):
-    '''Returns the atomic orbital index for a given atom index and orbital type.'''
+    '''Returns the atomic orbital index for a given atom index and orbital type
+
+    Parameters
+    ----------
+    atom_p : integer
+	The atom number to which the orbital belongs
+
+    orb_p : string
+	The type of the orbital out of 's', 'px', 'py', 'pz'
+
+    Returns
+    -------
+    p : integer
+	The index of the orbital based on the atom number and the orbital type
+    '''
     p = atom_p * orbitals_per_atom
     p += orbital_types.index(orb_p)
     return p
