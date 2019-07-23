@@ -39,6 +39,10 @@ def coulomb_energy(o1, o2, r12):
     ----------
     o1 : str
         Type of orbital 1
+    o2 : str
+        Type of orbital 2
+    r12 : float
+        Distance between the two atoms
 
     Returns
     -------
