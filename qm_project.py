@@ -82,7 +82,21 @@ def calculate_potential_vector(atomic_coordinates, model_parameters):
     return potential_vector
 
 def calculate_interaction_matrix(atomic_coordinates, model_parameters):
-    '''Returns the electron-electron interaction energy matrix for an input list of atomic coordinates.'''
+    '''Returns the electron-electron interaction energy matrix for an input list of atomic coordinates.
+
+    Parameters
+    ----------
+    atomic_coordinates : np.array
+        An array of atomic coordinates. Size should be of (N * 3) where N is the number of atoms
+    model_parameters : dict
+	A dictionary of empirical parameters that are used throughout the code
+
+    Returns
+    -------
+    interaction_matrix : np.array
+        An array of coefficients that describes the interaction between electrons
+    '''
+
     ndof = len(atomic_coordinates)*orbitals_per_atom
     interaction_matrix = np.zeros( (ndof,ndof) )
     for p in range(ndof):
@@ -97,7 +111,33 @@ def calculate_interaction_matrix(atomic_coordinates, model_parameters):
     return interaction_matrix
 
 def chi_on_atom(o1, o2, o3, model_parameters):
-    '''Returns the value of the chi tensor for 3 orbital indices on the same atom.'''
+    '''Returns the value of the chi tensor for 3 orbital indices on the same atom.
+    
+    Parameters
+    ----------
+    o1 :  string, should have type 's', 'px', 'py', 'pz'
+	  used to represent orbital type for orbital 1
+    o2 :  string, should have type 's', 'px', 'py', 'pz'
+	  used to represent orbital type for orbital 2
+    o3 :  string, should have type 's', 'px', 'py', 'pz'
+	  used to represent orbital type for orbital 3
+
+    Returns
+    -------
+    model_parameters['dipole'] : integer
+    
+    if the first two orbitals are of the same type, and the 3rd orbital is of p type (px, py, pz),
+    then returns 1.0 for the chi tensor value
+
+    if the first and 3rd orbitals are of the same type, 3rd orbital is of p type (px, py, pz), and
+    2nd orbital is of s type, then returns the value of chi tensor as calculated
+
+    if the 2nd and 3rd orbitals are of the same type, 3rd orbital is of p type (px, py, pz), and
+    1st orbital is of s type, then returns the value of chi tensor as calculated
+   
+    otherwise, returns 0.0 as the chi tensor value
+    '''
+
     if o1 == o2 and o3 == 's':
         return 1.0
     if o1 == o3 and o3 in p_orbitals and o2 == 's':
@@ -107,7 +147,21 @@ def chi_on_atom(o1, o2, o3, model_parameters):
     return 0.0
 
 def calculate_chi_tensor(atomic_coordinates, model_parameters):
-    '''Returns the chi tensor for an input list of atomic coordinates'''
+    '''Returns the chi tensor for an input list of atomic coordinates
+
+    Parameters
+    ----------
+    atomic_coordinates : np.array
+        An array of atomic coordinates. Size should be of (N * 3) where N is the number of atoms
+    model_parameters : dict
+	A dictionary of empirical parameters that are used throughout the code
+
+    Returns
+    -------
+    chi_tensor : np.array in 3 dimensional
+        An array that stores the values of chi tensor for an input list of atomic coordinates
+    '''
+
     ndof = len(atomic_coordinates) * orbitals_per_atom
     chi_tensor = np.zeros((ndof, ndof, ndof))
     for p in range(ndof):
@@ -120,7 +174,22 @@ def calculate_chi_tensor(atomic_coordinates, model_parameters):
     return chi_tensor
 
 def calculate_hamiltonian_matrix(atomic_coordinates, model_parameters):
-    '''Returns the 1-body Hamiltonian matrix for an input list of atomic coordinates.'''
+    '''Returns the 1-body Hamiltonian matrix for an input list of atomic coordinates.
+
+    Parameters
+    ----------
+    atomic_coordinates : np.array
+        An array of atomic coordinates. Size should be of (N * 3) where N is the number of atoms
+    model_parameters : dict
+	A dictionary of empirical parameters that are used throughout the code
+
+    Returns
+    -------
+    hamiltonian_matrix : np.array
+        An array that stores the core Hamiltonian matrix for an input list of atomic coordinates
+
+    '''
+
     ndof = len(atomic_coordinates) * orbitals_per_atom
     hamiltonian_matrix = np.zeros((ndof, ndof))
     potential_vector = calculate_potential_vector(atomic_coordinates,
