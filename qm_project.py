@@ -1,16 +1,52 @@
 import numpy as np
 
 def atom(ao_index):
-    '''Returns the atom index part of an atomic orbital index.'''
+    '''Returns the atom index part of an atomic orbital index
+
+    Parameters
+    ----------
+    ao_index : integer
+	It is the index assigned to a particular orbital in the system
+
+    Returns
+    -------
+    atom_num : integer
+	The atom number to which the orbital associated with the given atomic index belongs
+    '''
     return ao_index // orbitals_per_atom
 
 def orb(ao_index):
-    '''Returns the orbital type of an atomic orbital index.'''
+    '''Returns the orbital type of an atomic orbital index
+
+    Parameters
+    ----------
+    ao_index : integer
+	It is the index assigned to a particular orbital in the system
+
+    Returns
+    -------
+    orbital_type : string
+    	It returns the type of the orbital based on the atomic index as a string out of 's', 'px', 'py', 'pz'
+    '''
     orb_index = ao_index % orbitals_per_atom
     return orbital_types[orb_index]
 
 def ao_index(atom_p, orb_p):
-    '''Returns the atomic orbital index for a given atom index and orbital type.'''
+    '''Returns the atomic orbital index for a given atom index and orbital type
+
+    Parameters
+    ----------
+    atom_p : integer
+	The atom number to which the orbital belongs
+
+    orb_p : string
+	The type of the orbital out of 's', 'px', 'py', 'pz'
+
+    Returns
+    -------
+    p : integer
+	The index of the orbital based on the atom number and the orbital type
+    '''
     p = atom_p * orbitals_per_atom
     p += orbital_types.index(orb_p)
     return p
