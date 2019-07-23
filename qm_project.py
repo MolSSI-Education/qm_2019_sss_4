@@ -250,7 +250,19 @@ def calculate_hamiltonian_matrix(atomic_coordinates, model_parameters):
     return hamiltonian_matrix
 
 def calculate_atomic_density_matrix(atomic_coordinates):
-    '''Returns a trial 1-electron density matrix for an input list of atomic coordinates.'''
+    '''Returns a trial 1-electron density matrix based on atomic coordinates.
+    
+    Parameters
+    ----------
+    atomic_coordinates: np.array or list
+        An array/list of atomic coordinates. 
+        e.g. atomic_coordinates = np.array([[0.0, 0.0, 0.0], [3.0, 4.0, 5.0]])
+    
+    Returns
+    -------
+    density_matrix: np.array
+        m by m diagonal matrix, where m is the number of orbitals
+    '''
     ndof = len(atomic_coordinates) * orbitals_per_atom
     density_matrix = np.zeros((ndof, ndof))
     for p in range(ndof):
@@ -259,7 +271,25 @@ def calculate_atomic_density_matrix(atomic_coordinates):
 
 def calculate_fock_matrix(hamiltonian_matrix, interaction_matrix,
                           density_matrix, chi_tensor):
-    '''Returns the Fock matrix defined by the input Hamiltonian, interaction, & density matrices.'''
+    '''Returns the Fock matrix defined by the input Hamiltonian, interaction, & density matrices.
+    
+    Parameters
+    ----------
+    hamiltonian_matrix: np.array
+        m by m matrix, where m is the number of orbitals
+    interaction_matrix: np.array
+        m by m matrix, where m is the number of orbitals
+        electron-electron interaction energy matrix
+    density_matrix: np.array
+        m by m matrix, where m is the number of orbitals
+    chi_tensor: np.array
+        (m, m, m) tensor, where m is the number of orbitals
+
+    Returns
+    -------
+    fock_matrix: np.array
+        m by m matrix
+    '''
     fock_matrix = hamiltonian_matrix.copy()
     fock_matrix += 2.0 * np.einsum('pqt,rsu,tu,rs',
                                    chi_tensor,
@@ -276,7 +306,18 @@ def calculate_fock_matrix(hamiltonian_matrix, interaction_matrix,
     return fock_matrix
 
 def calculate_density_matrix(fock_matrix):
-    '''Returns the 1-electron density matrix defined by the input Fock matrix.'''
+    '''Returns the 1-electron density matrix defined by the input Fock matrix.
+    
+    Parameters
+    ----------
+    fock_matrix: np.array
+        m by m matrix, same dimension as hamiltonian matrix
+
+    Returns
+    -------
+    density_matrix: np.array
+        m by m matrix, updated density matrix
+    '''
     num_occ = (ionic_charge // 2) * np.size(fock_matrix,
                                             0) // orbitals_per_atom
     orbital_energy, orbital_matrix = np.linalg.eigh(fock_matrix)
@@ -287,7 +328,33 @@ def calculate_density_matrix(fock_matrix):
 def scf_cycle(hamiltonian_matrix, interaction_matrix, density_matrix,
               chi_tensor, max_scf_iterations = 100,
               mixing_fraction = 0.25, convergence_tolerance = 1e-4):
-    '''Returns converged density & Fock matrices defined by the input Hamiltonian, interaction, & density matrices.'''
+    '''Returns converged density & Fock matrices defined by the input Hamiltonian, interaction, & density matrices.
+    
+    Parameters
+    ----------
+    hamiltonian_matrix: np.array
+        m by m matrix, where m is the number of orbitals
+    interaction_matrix: np.array
+        m by m matrix, where m is the number of orbitals
+        electron-electron interaction energy matrix
+    density_matrix: np.array
+        m by m matrix, where m is the number of orbitals
+    chi_tensor: np.array
+        (m, m, m) tensor, where m is the number of orbitals
+    max_scf_iterations: integer, optional, default value is 100
+        maximum number of scf iterations allowed
+    mixing_fraction: float, optional, default value is 0.25
+        fraction of new density matrix
+    convergence_tolerance: float, optional, default value is 1e-4
+        threshold for norm of error matrix of density
+
+    Returns
+    -------
+    new_density_matrix: np.array
+        m by m matrix, where m is the number of orbitals
+    new_fock_matrix: np.array
+        m by m matrix, where m is the number of orbitals
+    '''
     old_density_matrix = density_matrix.copy()
     for iteration in range(max_scf_iterations):
         new_fock_matrix = calculate_fock_matrix(hamiltonian_matrix, interaction_matrix, old_density_matrix, chi_tensor)
