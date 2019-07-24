@@ -52,7 +52,26 @@ def ao_index(atom_p, orb_p):
     return p
 
 def hopping_energy(o1, o2, r12, model_parameters):
-    '''Returns the hopping matrix element for a pair of orbitals of type o1 & o2 separated by a vector r12.'''
+    '''Returns the hopping matrix element for a pair of orbitals of type o1 & o2 separated by a vector r12
+
+    Parameters
+    ----------
+    o1 : string
+	Orbital type 1. Takes orbital type as an input as one out of 's', 'px', 'py', 'pz'
+    o2 : string
+	Orbital type 2. Takes orbital type as an input as one out of 's', 'px', 'py', 'pz'
+    o3 : string
+	Orbital type 3. Takes orbital type as an input as one out of 's', 'px', 'py', 'pz'
+    r12 : numpy array
+	Vector pointing from the 2nd atom to the 1st atom
+    model_parameters : dict
+	Dictionary containing all parameters related to the model with energies in hartree, distances in bohr.
+
+    Returns
+    -------
+    ans : float
+	Returns the hopping energy based on the orbtial types for the frist and second atom
+    '''
     r12_rescaled = r12 / model_parameters['r_hop']
     r12_length = np.linalg.norm(r12_rescaled)
     ans = np.exp( 1.0 - r12_length**2 )
