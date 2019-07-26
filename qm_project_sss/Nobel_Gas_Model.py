@@ -49,7 +49,7 @@ class Noble_Gas_Model:
         else:
             raise TypeError("Gas type cannot be recognized: Ar, Argon, Ne and Neon expected")
 
-        self.ionic_charge = 0
+        self.ionic_charge = 6
 
         self.orbital_types = ['s', 'px', 'py', 'pz']
 
@@ -70,7 +70,6 @@ class Noble_Gas_Model:
 
         return p
 
-
     def atom(self, ao_index):
 
         return ao_index // self.orbitals_per_atom
@@ -81,17 +80,3 @@ class Noble_Gas_Model:
         orb_index = ao_index % self.orbitals_per_atom
 
         return self.orbital_types[orb_index]
-
-
-
-argon = Noble_Gas_Model('Argon')
-print(argon.model_parameters)
-print(argon.ionic_charge)
-print(argon.orbital_types)
-print(argon.orbitals_per_atom)
-print(argon.p_orbitals)
-print(argon.vec)
-print(argon.orbital_occupation)
-print(argon.atom(5))
-print(argon.orb(5))
-print(argon.ao_index(argon.atom(5),argon.orb(5)))
