@@ -6,13 +6,13 @@ Handles the primary functions
 """
 import numpy as np
 
-class Hartree_Fock:
+class HartreeFock:
     def __init__(self, atomic_coordinates, gas_model):
-        self.atomic_coordiantes = atomic_coordinates
+        self.atomic_coordinates = atomic_coordinates
 
         self.gas_model = gas_model
 
-        self.ndof = len(self.atomic_coordiantes) * self.gas_model.orbitals_per_atom
+        self.ndof = len(self.atomic_coordinates) * self.gas_model.orbitals_per_atom
 
         self.chi_tensor = self.calculate_chi_tensor()
 
@@ -24,7 +24,7 @@ class Hartree_Fock:
 
         self.hamiltonian_matrix = self.calculate_hamiltonian_matrix()
 
-        self.fock_matrix = self.calculate_fock_matrix()
+        self.fock_matrix = self.calculate_fock_matrix(self.density_matrix)
 
 
     def hopping_energy(self, o1, o2, r12):
@@ -250,7 +250,7 @@ class Hartree_Fock:
 
     def calculate_density_matrix(self):
 
-        num_occ = (self.gas_model.ionic_charge//2) * np.size(self.fock_matrix,0) // orbitals_per_atom
+        num_occ = (self.gas_model.ionic_charge//2) * np.size(self.fock_matrix,0) // self.gas_model.orbitals_per_atom
 
         orbital_energy, orbital_matrix = np.linalg.eigh(self.fock_matrix)
 
@@ -261,7 +261,9 @@ class Hartree_Fock:
         return density_matrix
 
 
-    def scf_cycle( self, max_scf_iterations = 100, mixing_fraction = 0.25, convergence_tolerance = 1e-4):
+    def scf_cycle( self, max_scf_iterations = 100, mixing_fraction = 0.25, convergence_tolerance = 1e-10):
+
+        self.density_matrix = self.calculate_density_matrix()
 
         old_density_matrix = self.density_matrix.copy()
 
@@ -269,7 +271,7 @@ class Hartree_Fock:
 
             self.fock_matrix = self.calculate_fock_matrix(old_density_matrix)
 
-            self.density_matrix = calculate_density_matrix()
+            self.density_matrix = self.calculate_density_matrix()
 
             error_norm = np.linalg.norm( old_density_matrix - self.density_matrix)
 
