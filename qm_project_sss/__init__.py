@@ -5,8 +5,8 @@ This package implements semi-empirical quantum mechanical (SCF+MP2) simulation p
 
 # Add imports here
 from .hartree_fock import *
-from .mp2 import *
-from .nobel_gas_model import *
+# from .mp2 import *
+from .noble_gas_model import *
 
 # Handle versioneer
 from ._version import get_versions
