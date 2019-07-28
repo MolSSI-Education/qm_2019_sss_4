@@ -1,7 +1,7 @@
 import numpy as np
 
 # initialized with a gas type
-class Noble_Gas_Model:
+class Nobel_Gas_Model:
 
     def __init__(self, gas_type):
 
