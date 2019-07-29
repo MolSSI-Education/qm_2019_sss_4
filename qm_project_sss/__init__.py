@@ -8,7 +8,6 @@ from .hartree_fock import *
 # from .mp2 import *
 from .Noble_Gas_Model import *
 
-# Handle versioneer
 from ._version import get_versions
 versions = get_versions()
 __version__ = versions['version']

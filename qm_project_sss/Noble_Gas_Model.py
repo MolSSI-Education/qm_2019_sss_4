@@ -1,5 +1,4 @@
-
-
+# initialized with a gas type
 class NobleGasModel:
     """ This class is initialized with a gas type 
     gas_type currently supported: Argon(Ar), Neon(Ne)
