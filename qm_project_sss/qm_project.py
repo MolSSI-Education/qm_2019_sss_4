@@ -404,13 +404,45 @@ def scf_cycle(hamiltonian_matrix, interaction_matrix, density_matrix,
     return new_density_matrix, new_fock_matrix
 
 def calculate_energy_scf(hamiltonian_matrix, fock_matrix, density_matrix):
-    '''Returns the Hartree-Fock total energy defined by the input Hamiltonian, Fock, & density matrices.'''
+    '''Returns the Hartree-Fock total energy defined by the input Hamiltonian, Fock, & density matrices.
+
+    Parameters
+    ----------
+    hamiltonian_matrix: np.array
+        m by m matrix, where m is the number of orbitals
+    fock_matrix: np.array
+        m by m matrix, same dimension as hamiltonian matrix
+    density_matrix: np.array
+        m by m matrix, where m is the number of orbitals
+
+    Returns
+    -------
+    energy_scf: float
+        Returns the Hartree-Fock total energy    
+    '''
     energy_scf = np.einsum('pq,pq', hamiltonian_matrix + fock_matrix,
                            density_matrix)
     return energy_scf
 
 def partition_orbitals(fock_matrix):
-    '''Returns a list with the occupied/virtual energies & orbitals defined by the input Fock matrix.'''
+    '''Returns a list with the occupied/virtual energies & orbitals defined by the input Fock matrix.
+
+    Parameters
+    ----------
+    fock_matrix: np.array
+        m by m matrix, same dimension as hamiltonian matrix
+
+    Returns
+    -------
+    occupied_energy: float
+        Return energy from occupied orbitals 
+    virtual_energy: float
+        Return energy from unoccupied orbitals
+    occupied_matrix: np.array
+        Returns a m by m matrix, where m is the number of occupied orbitals
+    virtual_matrix: np.array
+        Returns m by m matrix, where m is the number of unoccupied orbitals
+    '''
     num_occ = (ionic_charge // 2) * np.size(fock_matrix,
                                             0) // orbitals_per_atom
     orbital_energy, orbital_matrix = np.linalg.eigh(fock_matrix)
@@ -423,7 +455,25 @@ def partition_orbitals(fock_matrix):
 
 def transform_interaction_tensor(occupied_matrix, virtual_matrix,
                                  interaction_matrix, chi_tensor):
-    '''Returns a transformed V tensor defined by the input occupied, virtual, & interaction matrices.'''
+    '''Returns a transformed V tensor defined by the input occupied, virtual, & interaction matrices.
+    
+    Parameters
+    ----------
+    occupied_matrix: np.array
+        m by m matrix, where m is the number of occupied orbitals
+    virtual_matrix: np.array
+        m by m matrix, where m is the number of unoccupied orbitals
+    interaction_matrix: np.array
+        m by m matrix, where m is the number of orbitals
+        electron-electron interaction energy matrix
+    chi_tensor: np.array
+        (m, m, m) tensor, where m is the number of orbitals
+
+    Returns
+    -------
+    interaction_tensor: np.array
+         Returns a transformed V tensor
+    '''
     chi2_tensor = np.einsum('qa,ri,qrp',
                             virtual_matrix,
                             occupied_matrix,
@@ -437,7 +487,23 @@ def transform_interaction_tensor(occupied_matrix, virtual_matrix,
     return interaction_tensor
 
 def calculate_energy_mp2(fock_matrix, interaction_matrix, chi_tensor):
-    '''Returns the MP2 contribution to the total energy defined by the input Fock & interaction matrices.'''
+    '''Returns the MP2 contribution to the total energy defined by the input Fock & interaction matrices.
+
+    Parameters
+    ----------
+    fock_matrix: np.array
+        m by m matrix, same dimension as hamiltonian matrix
+    interaction_matrix: np.array
+        m by m matrix, where m is the number of orbitals
+        electron-electron interaction energy matrix
+    chi_tensor: np.array
+        (m, m, m) tensor, where m is the number of orbitals
+
+    Returns
+    -------
+    energy_mp2: float
+        Returns the MP2 contribution to the total energy.
+    '''
     E_occ, E_virt, occupied_matrix, virtual_matrix = partition_orbitals(
         fock_matrix)
     V_tilde = transform_interaction_tensor(occupied_matrix, virtual_matrix,
@@ -511,10 +577,17 @@ if __name__ == "__main__":
     energy_scf = calculate_energy_scf(hamiltonian_matrix, fock_matrix, density_matrix)
 
     # Hartree Fock Energy
-    print(energy_scf + energy_ion)
+    print(F'Hartree Fock Energy =', energy_scf + energy_ion, F'a.u.'
+          , F' = ',(energy_scf + energy_ion)*27.2116, F'eV')
 
     # MP 2 - Fock matrix from SCF
     occupied_energy, virtual_energy, occupied_matrix, virtual_matrix = partition_orbitals(fock_matrix)
     interaction_tensor = transform_interaction_tensor(occupied_matrix, virtual_matrix, interaction_matrix, chi_tensor)
     energy_mp2 = calculate_energy_mp2(fock_matrix, interaction_matrix, chi_tensor)
-    print(energy_mp2)
+    print(F'MP2 contribution =', energy_mp2, F'a.u.', F' = ', energy_mp2*27.2116, F'eV')
+    print(F'MP2 Energy =', energy_scf + energy_ion + energy_mp2, F'a.u.'
+          , F' = ',(energy_scf + energy_ion + energy_mp2)*27.2116, F'eV')
+
+    # Error
+    print((energy_mp2 / (energy_scf + energy_ion + energy_mp2) ) * 100)
+  
