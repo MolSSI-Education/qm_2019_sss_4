@@ -1,8 +1,7 @@
 """
 hartree_fock.py
 This package implements semi-empirical quantum mechanical (SCF+MP2) simulation parameterized to reproduce first-principles QM data using a minimal model.
-
-Handles the primary functions
+Contains a HartreeFock class which performs atomic SCF calculations.
 """
 import numpy as np
 

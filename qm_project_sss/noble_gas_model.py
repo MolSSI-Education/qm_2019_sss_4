@@ -1,17 +1,15 @@
-import numpy as np
 
-# initialized with a gas type
-class Noble_Gas_Model:
 
+class NobleGasModel:
+    """ This class is initialized with a gas type 
+    gas_type currently supported: Argon(Ar), Neon(Ne)
+    """
     def __init__(self, gas_type):
-
         """model_parameters : a dictionary of parameters"""
 
         if isinstance(gas_type, str):
-
             self.gas_type = gas_type
         else:
-
             raise TypeError("Name should be a string!")
 
         if (self.gas_type.lower() == "ar" or self.gas_type.lower() == "argon"):
@@ -47,7 +45,7 @@ class Noble_Gas_Model:
             }
 
         else:
-            raise TypeError("Gas type cannot be recognized: Ar, Argon, Ne and Neon expected")
+            raise TypeError("Noble Gas Model Not Supported! Ar, Argon, Ne and Neon expected")
 
         self.ionic_charge = 6
 
@@ -63,20 +61,56 @@ class Noble_Gas_Model:
 
 
     def ao_index(self, atom_p, orb_p):
+        """ Returns the index of the atomic orbital based on the index of atom and orbital type
+        
+        Parameters
+        ----------
+        atom_p: integer
+            index of the atom where the orbital centers
+        orb_p: string
+            orbital type, only 's', 'px', 'py', 'pz' are supported in this class
 
+        Returns
+        -------
+        p: integer
+            index of the atomic orbital
+        """
         p = atom_p * self.orbitals_per_atom
-
         p += self.orbital_types.index(orb_p)
 
         return p
 
     def atom(self, ao_index):
-
-        return ao_index // self.orbitals_per_atom
+        """ Returns the index of the atom based on the index of atomic orbital
+        
+        Parameters
+        ----------
+        ao_index: integer
+            index of the atomic orbital 
+                
+        Returns
+        -------
+        atom_index: integer
+            index of the atom where the orbital centers
+        """
+        atom_index = ao_index // self.orbitals_per_atom
+        return atom_index
 
 
     def orb(self, ao_index):
+        """ Returns the type of atomic orbital based on its index
 
+        Parameters
+        ----------
+        ao_index: integer
+            index of the atomic orbital 
+
+        Returns
+        -------
+        orb_type: string
+            orbital type, only 's', 'px', 'py', 'pz' are supported in this class
+         
+        """
         orb_index = ao_index % self.orbitals_per_atom
-
-        return self.orbital_types[orb_index]
+        orb_type = self.orbital_types[orb_index]
+        return orb_type
