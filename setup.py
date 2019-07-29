@@ -3,7 +3,9 @@ qm_project_sss
 This package implements semi-empirical quantum mechanical (SCF+MP2) simulation parameterized to reproduce first-principles QM data using a minimal model.
 """
 import sys
-from setuptools import setup, find_packages
+import os
+import platform
+from setuptools import setup, find_packages, Extension
 import versioneer
 
 short_description = __doc__.split("\n")
@@ -18,6 +20,25 @@ try:
 except:
     long_description = "\n".join(short_description[2:]),
 
+#################################################################
+# Build our C++ module
+# NOTE: Pybind11/Eigen were installed into CONDA_PREFIX
+#       so we need to add that to the include paths
+conda_prefix = os.environ['CONDA_PREFIX']
+eigen_path = os.path.join(conda_prefix, 'include', 'eigen3')
+
+# MacOSX causes some problems. This is due to a recent
+# deprecation of the stdc++ library
+
+if sys.platform == 'darwin':
+    os.environ['MACOSX_DEPLOYMENT_TARGET'] = platform.mac_ver()[0]
+
+cpp_module = Extension('qm_project_sss.hf_C',
+                        include_dirs = [eigen_path],
+                        extra_compile_args = ['-std=c++11'],
+                        sources = ['hf_C/hf.C',
+                                   'hf_C/export.C'])
+#################################################################
 
 setup(
     # Self-descriptive entries which should always be present
@@ -43,6 +64,9 @@ setup(
 
     # Allows `setup.py test` to work correctly with pytest
     setup_requires=[] + pytest_runner,
+
+    # Include the compiled extension
+    ext_modules = [cpp_module]
 
     # Additional entries you may want simply uncomment the lines you want and fill in the data
     # url='http://www.my_package.com',  # Website
