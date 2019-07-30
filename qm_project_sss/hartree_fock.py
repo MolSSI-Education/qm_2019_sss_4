@@ -31,7 +31,8 @@ class HartreeFock:
         m by m matrix, containing the fock elements
 
     """
-    def __init__(self, atomic_coordinates, gas_model):
+
+    def __init__(self, atomic_coordinates, gas_model, fock_mode = 'slow', use_cpp_module = False):
         """Creates an instance of the class for the given system to apply HF theory
 
         Parameters
@@ -40,11 +41,24 @@ class HartreeFock:
             The array of the coordinates of all the atoms in the system
         gas_model : object of the class Nobel_Gas_Model
             This is an object of the class Nobel_Gas_Model for a given gas type
+        fock_mode: string, optional
+            'slow'(default), 'fast'
+            provides 2 ways of implementing fock matrix construction
+                'slow' version in python
+                'fast' version in python and cpp which is equivalent in functionality.
+        use_cpp_module: boolean, optional
+            default is False
+            if True, fock_mode should be 'fast'
+            
         """
 
         self.atomic_coordinates = atomic_coordinates
         # gas_model is a object of NobleGasModel
         self.gas_model = gas_model
+
+        self.fock_mode = fock_mode
+
+        self.use_cpp_module = use_cpp_module
 
         self.ndof = len(self.atomic_coordinates) * self.gas_model.orbitals_per_atom
 
@@ -415,7 +429,7 @@ class HartreeFock:
         return density_matrix
 
 
-    def calculate_fock_matrix(self, old_density_matrix, construction_mode = 'slow', use_cpp_module = False):
+    def calculate_fock_matrix(self, old_density_matrix):
         """
         Returns the Fock matrix defined by the input Hamiltonian, interaction, & density matrices.
 
@@ -436,37 +450,39 @@ class HartreeFock:
         fock_matrix: np.array
             m by m matrix
         """
+        fock_matrix = self.hamiltonian_matrix.copy()
 
-        if construction_mode == 'slow':
-            fock_matrix = self.hamiltonian_matrix.copy()
-
+        if self.fock_mode == 'slow':
+            
             fock_matrix += 2.0*np.einsum('pqt,rsu,tu,rs->pq', self.chi_tensor, self.chi_tensor, self.interaction_matrix, old_density_matrix , optimize=True)
 
             fock_matrix -= np.einsum('rqt,psu,tu,rs->pq', self.chi_tensor, self.chi_tensor, self.interaction_matrix, old_density_matrix, optimize=True)
+        
+        if self.fock_mode == 'fast':
 
-        if construction_mode == 'fast':
-            if use_cpp_module:
+            if self.use_cpp_module:
+              
                 from qm_project_sss.hf_C import fock_matrix_rewrite
                 dipole = self.gas_model.model_parameters['dipole']
                 fock_matrix = fock_matrix_rewrite(self.hamiltonian_matrix, self.density_matrix, self.interaction_matrix, dipole)
+            
             else:
-                fock_matrix = self.hamiltonian_matrix.copy()
                 # Hartree potential term
                 for p in range(self.ndof):
                     for orb_q in self.gas_model.orbital_types:
                         q = self.gas_model.ao_index(self.gas_model.atom(p), orb_q)  # p & q on same atom
                         for orb_t in self.gas_model.orbital_types:
                             t = self.gas_model.ao_index(self.gas_model.atom(p), orb_t)  # p & t on same atom
-                            chi_pqt = self.chi_on_atom(self.gas_model.orb(p), orb_q, orb_t,
-                                                       self.gas_model.model_parameters)
+                            chi_pqt = self.chi_on_atom(self.gas_model.orb(p), orb_q, orb_t)
                             for r in range(self.ndof):
                                 for orb_s in self.gas_model.orbital_types:
                                     s = self.gas_model.ao_index(self.gas_model.atom(r), orb_s)  # r & s on same atom
                                     for orb_u in self.gas_model.orbital_types:
                                         u = self.gas_model.ao_index(self.gas_model.atom(r),
                                                                     orb_u)  # r & u on same atom
-                                        chi_rsu = self.chi_on_atom(self.gas_model.orb(r),
-                                                                   orb_s, orb_u, self.gas_model.model_parameters)
+
+                                        chi_rsu = self.chi_on_atom(self.gas_model.orb(r), orb_s, orb_u)
+
                                         fock_matrix[p, q] += 2.0 * chi_pqt * chi_rsu * \
                                             self.interaction_matrix[t, u] * self.density_matrix[r, s]
                 # Fock exchange term
@@ -475,16 +491,14 @@ class HartreeFock:
                         s = self.gas_model.ao_index(self.gas_model.atom(p), orb_s)  # p & s on same atom
                         for orb_u in self.gas_model.orbital_types:
                             u = self.gas_model.ao_index(self.gas_model.atom(p), orb_u)  # p & u on same atom
-                            chi_psu = self.chi_on_atom(self.gas_model.orb(p), orb_s, orb_u,
-                                                       self.gas_model.model_parameters)
+                            chi_psu = self.chi_on_atom(self.gas_model.orb(p), orb_s, orb_u)       
                             for q in range(self.ndof):
                                 for orb_r in self.gas_model.orbital_types:
                                     r = self.gas_model.ao_index(self.gas_model.atom(q), orb_r)  # q & r on same atom
                                     for orb_t in self.gas_model.orbital_types:
                                         t = self.gas_model.ao_index(self.gas_model.atom(q),
                                                                     orb_t)  # q & t on same atom
-                                        chi_rqt = self.chi_on_atom(
-                                            orb_r, self.gas_model.orb(q), orb_t, self.gas_model.model_parameters)
+                                        chi_rqt = self.chi_on_atom(orb_r, self.gas_model.orb(q), orb_t)
                                         fock_matrix[p, q] -= chi_rqt * chi_psu * self.interaction_matrix[t, u] * self.density_matrix[r, s]
 
         return fock_matrix
@@ -514,7 +528,7 @@ class HartreeFock:
 
         return density_matrix
 
-    def scf_cycle(self, max_scf_iterations=100, mixing_fraction=0.25, convergence_tolerance=1e-10, construction_mode='slow', use_cpp_module=False):
+    def scf_cycle(self, max_scf_iterations=100, mixing_fraction=0.25, convergence_tolerance=1e-10):
         """
         Returns converged density & Fock matrices defined by the input Hamiltonian, interaction, & density matrices.
 
@@ -550,13 +564,13 @@ class HartreeFock:
 
         for iteration in range(max_scf_iterations):
 
-            self.fock_matrix = self.calculate_fock_matrix(old_density_matrix, use_cpp_module)
+            self.fock_matrix = self.calculate_fock_matrix(old_density_matrix)
 
             self.density_matrix = self.calculate_density_matrix()
 
             error_norm = np.linalg.norm( old_density_matrix - self.density_matrix)
 
-            print(iteration, error_norm)
+            # print(iteration, error_norm)
 
             if error_norm < convergence_tolerance:
 
