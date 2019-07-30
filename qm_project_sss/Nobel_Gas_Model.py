@@ -12,7 +12,6 @@ class Nobel_Gas_Model:
         """
 
         if isinstance(gas_type, str):
-
             self.gas_type = gas_type
         else:
 
