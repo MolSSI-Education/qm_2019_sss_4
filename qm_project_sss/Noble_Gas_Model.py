@@ -1,13 +1,48 @@
-# initialized with a gas type
-class NobleGasModel:
-    def __init__(self, gas_type):
-        """Creates an instance of the class for a given gas type
+"""
+Noble_Gas_Model.py
+The qm_project_sss package implements semi-empirical quantum mechanical (SCF+MP2) simulation parameterized to reproduce first-principles QM data using a minimal model.
+This module contains a NobleGasModel class which has data associated with the noble gas model, and utility functions for indexing.
+"""
 
+class NobleGasModel:
+
+    def __init__(self, gas_type):
+        """ Initialized an instance with a gas_type, gas_type currently supported: Argon(Ar), Neon(Ne)
+            
         Parameters
         ----------
-        gas_type : string
-            Defines the gas type in the system (out of Ar or Ne)
+        gas_type: string
+            string of noble element name, case-insensitive
+            e.g. 'Argon', 'Ar', 'NEON', 'ne'
+
+        Attributes
+        ----------
+        model_parameters : dict
+            dictionary of empirical parameters for a specific noble gas.
+        ionic_charge: integer
+            6 for NobleGasModel.
+        orbital_types: list
+            list of orbital types.
+            ['s', 'px', 'py', 'pz']
+        orbitals_per_atom: integer
+            4 for NobleGasModel.
+        p_orbitals: list
+            list of p orbital types.
+            ['px', 'py', 'pz']
+        vec: dict
+            dictionary of direction vectors for different p orbitals.
+            { 'px':[1,0,0], 'py':[0,1,0], 'pz':[0,0,1] }
+        orbital_occupation: dict
+            dictionary of occupation numbers for different orbital type.
+            {'s':0, 'px':1, 'py':1, 'pz':1}
+
+        Methods
+        -------
+        ao_index(atom_p, orb_p)
+        atom(ao_index)
+        orb(ao_index)
         """
+      
         if isinstance(gas_type, str):
             self.gas_type = gas_type
         else:
@@ -46,7 +81,7 @@ class NobleGasModel:
             }
 
         else:
-            raise TypeError("Noble Gas Model Not Supported! Ar, Argon, Ne and Neon expected")
+            raise TypeError("Noble Gas Model Not Supported! Argon(Ar) Neon(Ne) expected")
 
         self.ionic_charge = 6
 
@@ -62,9 +97,8 @@ class NobleGasModel:
 
 
     def ao_index(self, atom_p, orb_p):
-        """
-	Returns the index of the atomic orbital based on the index of atom and orbital type
-	
+        """ Returns the index of the atomic orbital for a given atom index and orbital type.
+        
         Parameters
         ----------
         atom_p : integer
@@ -83,9 +117,8 @@ class NobleGasModel:
         return p
 
     def atom(self, ao_index):
-        """
-        Returns the atom index part of an atomic orbital index
-
+        """ Returns the index of the atom for a given atomic orbital index.
+ 
         Parameters
         ----------
         ao_index : integer
@@ -93,17 +126,16 @@ class NobleGasModel:
 
         Returns
         -------
-        atom_num : integer
-	       The atom number to which the orbital associated with the given atomic index belongs
+        integer
+	        index of the atom where the orbital centers
         """
 
         return ao_index // self.orbitals_per_atom
 
 
     def orb(self, ao_index):
-        """
-        Returns the orbital type of an atomic orbital index
-
+        """ Returns the type of atomic orbital given its index
+       
         Parameters
         ----------
         ao_index : integer
