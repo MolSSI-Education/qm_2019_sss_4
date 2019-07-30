@@ -97,7 +97,7 @@ class NobleGasModel:
 
 
     def ao_index(self, atom_p, orb_p):
-        """ Returns the index of the atomic orbital based on the index of atom and orbital type
+        """ Returns the index of the atomic orbital for a given atom index and orbital type.
         
         Parameters
         ----------
@@ -117,7 +117,7 @@ class NobleGasModel:
         return p
 
     def atom(self, ao_index):
-        """ Returns the index of the atom based on the index of atomic orbital
+        """ Returns the index of the atom for a given atomic orbital index.
         
         Parameters
         ----------
@@ -134,7 +134,7 @@ class NobleGasModel:
 
 
     def orb(self, ao_index):
-        """ Returns the type of atomic orbital based on its index
+        """ Returns the type of atomic orbital given its index
 
         Parameters
         ----------

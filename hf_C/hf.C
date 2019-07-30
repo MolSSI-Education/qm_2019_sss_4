@@ -1,8 +1,9 @@
 #include "hf.h"
 
 Eigen::MatrixXd fock_matrix_rewrite(Eigen::MatrixXd hamiltonianMatrix, Eigen::MatrixXd densityMatrix, Eigen::MatrixXd interactionMatrix, double dipole)
-{	
-    int ndofRows = hamiltonianMatrix.rows();
+{
+	// auto start = std::chrono::high_resolution_clock::now();
+	int ndofRows = hamiltonianMatrix.rows();
 	int ndofCols = hamiltonianMatrix.cols();
 	//std::cout << "my matrix has " << hamiltonianMatrix.rows() << " number of rows" << std::endl;
 	//std::cout << "my matrix has " << hamiltonianMatrix.cols() << " number of cols" << std::endl;
@@ -12,8 +13,8 @@ Eigen::MatrixXd fock_matrix_rewrite(Eigen::MatrixXd hamiltonianMatrix, Eigen::Ma
     for (int i = 0; i < orbitals_per_atom; i++)
 		orbital_types.push_back(i);
     
-    for (size_t i = 0; i < orbital_types.size(); i++)     
-        std::cout << orbital_types[i] << "\n";  
+    // for (size_t i = 0; i < orbital_types.size(); i++)     
+    //     std::cout << orbital_types[i] << "\n";  
 
 	for (int i = 0; i < ndofRows; i++)
 		for (int j = 0; j < ndofCols; j++)
@@ -69,7 +70,8 @@ Eigen::MatrixXd fock_matrix_rewrite(Eigen::MatrixXd hamiltonianMatrix, Eigen::Ma
 			}
 	    }
 	}
-    std::cout << "The program reaches here" << std::endl;
+	// std::cout << "The program reaches here" << std::endl;
+	// std::cout << "The program is updated" << std::endl;
 	for (int p = 0; p < ndofRows; p++)
 	{
 		for (int orb_s = 0; orb_s < orbitals_per_atom; orb_s++)
@@ -95,7 +97,11 @@ Eigen::MatrixXd fock_matrix_rewrite(Eigen::MatrixXd hamiltonianMatrix, Eigen::Ma
 			}
 		}	
 	}
-    return fockMatrix;
+	// auto finish = std::chrono::high_resolution_clock::now();
+	// std::cout << "The C++ program returns a proper fock matrix" << std::endl;
+	// std::chrono::duration<double> elapsed = finish - start;
+	// std::cout << "Elapsed time: " << elapsed.count() << "s\n";
+	return fockMatrix;
 }
 
 

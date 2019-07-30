@@ -135,6 +135,14 @@ def test_scf_energy(hf_1):
     calculated_hf_energy = hf_1.calculate_energy_ion() + hf_1.calculate_energy_scf()
     assert expected_hf_energy == calculated_hf_energy
 
+def test_fock_implementation_fast(hf_1):
+    expected_hf_energy = -17.901180746673777
+    hf_1.scf_cycle(construction_mode='fast', use_cpp_module=False)
+    calculated_hf_energy = hf_1.calculate_energy_ion() + hf_1.calculate_energy_scf()
+    assert expected_hf_energy == calculated_hf_energy
+
+# This test is to check the two fock matrix implementations
+# def test_fock_diff
 
 """Tests for MP2 class
 """
