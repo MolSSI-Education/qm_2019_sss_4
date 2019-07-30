@@ -11,7 +11,7 @@ import numpy as np
 @pytest.fixture()
 def Ar_gas():
     n = 'Argon'
-    argon = qm_project_sss.Nobel_Gas_Model(n)
+    argon = qm_project_sss.NobleGasModel(n)
     return argon
 
 def test_qm_project_sss_imported():
@@ -22,7 +22,7 @@ def test_create_failure():
     name = 20
 
     with pytest.raises(TypeError):
-        helium = qm_project_sss.Nobel_Gas_Model(name)
+        helium = qm_project_sss.NobleGasModel(name)
 
 def test_correct_dictionary(Ar_gas):
     test_dict_Ar = {

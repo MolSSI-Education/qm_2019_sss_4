@@ -25,6 +25,7 @@ class HartreeFock:
 
         self.fock_matrix = self.calculate_fock_matrix(self.density_matrix)
 
+        # self.energy_scf = self.calculate_energy_scf()
 
     def hopping_energy(self, o1, o2, r12):
         r12_rescaled = r12 / self.gas_model.model_parameters['r_hop']
@@ -260,7 +261,7 @@ class HartreeFock:
         return density_matrix
 
 
-    def scf_cycle( self, max_scf_iterations = 100, mixing_fraction = 0.25, convergence_tolerance = 1e-10):
+    def scf_cycle(self, max_scf_iterations = 100, mixing_fraction = 0.25, convergence_tolerance = 1e-10):
 
         self.density_matrix = self.calculate_density_matrix()
 
