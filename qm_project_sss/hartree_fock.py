@@ -6,7 +6,7 @@ This module contains a HartreeFock class which performs atomic SCF calculations.
 import numpy as np
 
 class HartreeFock:
-    def __init__(self, atomic_coordinates, gas_model):
+    def __init__(self, atomic_coordinates, gas_model, fock_mode = 'slow', use_cpp_module = False):
         """Creates an instance of the class for the given system to apply HF theory
 
         Parameters
@@ -15,11 +15,24 @@ class HartreeFock:
             The array of the coordinates of all the atoms in the system
         gas_model : object of the class Nobel_Gas_Model
             This is an object of the class Nobel_Gas_Model for a given gas type
+        fock_mode: string, optional
+            'slow'(default), 'fast'
+            provides 2 ways of implementing fock matrix construction
+                'slow' version in python
+                'fast' version in python and cpp which is equivalent in functionality.
+        use_cpp_module: boolean, optional
+            default is False
+            if True, fock_mode should be 'fast'
+            
         """
 
         self.atomic_coordinates = atomic_coordinates
         # gas_model is a object of NobleGasModel
         self.gas_model = gas_model
+
+        self.fock_mode = fock_mode
+
+        self.use_cpp_module = use_cpp_module
 
         self.ndof = len(self.atomic_coordinates) * self.gas_model.orbitals_per_atom
         
@@ -397,7 +410,7 @@ class HartreeFock:
         return density_matrix
 
 
-    def calculate_fock_matrix(self, old_density_matrix, construction_mode = 'slow', use_cpp_module = False):
+    def calculate_fock_matrix(self, old_density_matrix):
         """
         Returns the Fock matrix defined by the input Hamiltonian, interaction, & density matrices.
 
@@ -420,17 +433,20 @@ class HartreeFock:
         """
         fock_matrix = self.hamiltonian_matrix.copy()
 
-        if construction_mode == 'slow':
+        if self.fock_mode == 'slow':
             
             fock_matrix += 2.0*np.einsum('pqt,rsu,tu,rs->pq', self.chi_tensor, self.chi_tensor, self.interaction_matrix, old_density_matrix , optimize=True)
 
             fock_matrix -= np.einsum('rqt,psu,tu,rs->pq', self.chi_tensor, self.chi_tensor, self.interaction_matrix, old_density_matrix, optimize=True)
         
-        if construction_mode == 'fast':
-            if use_cpp_module:
+        if self.fock_mode == 'fast':
+
+            if self.use_cpp_module:
+
                 from qm_project_sss.hf_C import fock_matrix_rewrite
                 dipole = self.gas_model.model_parameters['dipole']
                 fock_matrix = fock_matrix_rewrite(self.hamiltonian_matrix, self.density_matrix, self.interaction_matrix, dipole)
+            
             else:
                 # Hartree potential term
                 for p in range(self.ndof):
@@ -491,7 +507,7 @@ class HartreeFock:
 
         return density_matrix
 
-    def scf_cycle(self, max_scf_iterations=100, mixing_fraction=0.25, convergence_tolerance=1e-10, mode='slow', cpp_module=False):
+    def scf_cycle(self, max_scf_iterations=100, mixing_fraction=0.25, convergence_tolerance=1e-10):
         """
         Returns converged density & Fock matrices defined by the input Hamiltonian, interaction, & density matrices.
 
@@ -527,14 +543,13 @@ class HartreeFock:
 
         for iteration in range(max_scf_iterations):
 
-            self.fock_matrix = self.calculate_fock_matrix(
-                old_density_matrix, construction_mode=mode, use_cpp_module=cpp_module)
+            self.fock_matrix = self.calculate_fock_matrix(old_density_matrix)
 
             self.density_matrix = self.calculate_density_matrix()
 
             error_norm = np.linalg.norm( old_density_matrix - self.density_matrix)
 
-            print(iteration, error_norm)
+            # print(iteration, error_norm)
 
             if error_norm < convergence_tolerance:
 
