@@ -8,6 +8,7 @@ import pytest
 import sys
 import numpy as np
 import numpy.testing as npt
+from timeit import default_timer as timer
 
 """Tests for NobelGasModel class
 """
@@ -135,14 +136,37 @@ def test_scf_energy(hf_1):
     calculated_hf_energy = hf_1.calculate_energy_ion() + hf_1.calculate_energy_scf()
     assert expected_hf_energy == calculated_hf_energy
 
-def test_fock_implementation_fast(hf_1):
-    expected_hf_energy = -17.901180746673777
-    hf_1.scf_cycle(construction_mode='fast', use_cpp_module=False)
-    calculated_hf_energy = hf_1.calculate_energy_ion() + hf_1.calculate_energy_scf()
-    assert expected_hf_energy == calculated_hf_energy
 
+# def test_fock_implementation_fast(hf_1):
+#     expected_hf_energy = -17.901180746673777
+#     hf_1.scf_cycle(mode='fast', cpp_module=False)  # using python 
+#     calculated_hf_energy = hf_1.calculate_energy_ion() + hf_1.calculate_energy_scf()
+#     assert pytest.approx(expected_hf_energy) == calculated_hf_energy
+
+# def test_fock_implementation_fast_cpp(hf_1):
+#     expected_hf_energy = -17.901180746673777
+#     hf_1.scf_cycle(mode='fast', cpp_module=True)
+#     calculated_hf_energy = hf_1.calculate_energy_ion() + hf_1.calculate_energy_scf()
+#     assert pytest.approx(expected_hf_energy) == calculated_hf_energy
 # This test is to check the two fock matrix implementations
 # def test_fock_diff
+
+
+
+def build_fcc_cluster(radius, lattice_constant):
+    """ Build sequence of atom clusters of increasing size to
+        compare performance of 2 implementations of fock matrix computation
+    """ 
+    vec1 = np.array([lattice_constant, lattice_constant, 0.0])
+    vec2 = np.array([lattice_constant, 0.0, lattice_constant])
+    vec3 = np.array([0.0, lattice_constant, lattice_constant])
+    max_index = int(radius/np.linalg.norm(vec1))
+    atomic_coordinates = np.array([ i*vec1 + j*vec2 + k*vec3 for i in range(-max_index, max_index+1)
+                                                             for j in range(-max_index, max_index+1)
+                                                             for k in range(-max_index, max_index+1)
+                                                             if np.linalg.norm(i*vec1 + j*vec2 + k*vec3) <= radius ])
+    return atomic_coordinates
+
 
 """Tests for MP2 class
 """
