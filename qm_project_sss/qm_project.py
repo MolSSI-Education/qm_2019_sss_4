@@ -2,12 +2,10 @@ import numpy as np
 
 def atom(ao_index):
     '''Returns the atom index part of an atomic orbital index
-
     Parameters
     ----------
     ao_index : integer
 	It is the index assigned to a particular orbital in the system
-
     Returns
     -------
     atom_num : integer
@@ -17,12 +15,10 @@ def atom(ao_index):
 
 def orb(ao_index):
     '''Returns the orbital type of an atomic orbital index
-
     Parameters
     ----------
     ao_index : integer
 	It is the index assigned to a particular orbital in the system
-
     Returns
     -------
     orbital_type : string
@@ -33,15 +29,12 @@ def orb(ao_index):
 
 def ao_index(atom_p, orb_p):
     '''Returns the atomic orbital index for a given atom index and orbital type
-
     Parameters
     ----------
     atom_p : integer
 	The atom number to which the orbital belongs
-
     orb_p : string
 	The type of the orbital out of 's', 'px', 'py', 'pz'
-
     Returns
     -------
     p : integer
@@ -53,7 +46,6 @@ def ao_index(atom_p, orb_p):
 
 def hopping_energy(o1, o2, r12, model_parameters):
     '''Returns the hopping matrix element for a pair of orbitals of type o1 & o2 separated by a vector r12
-
     Parameters
     ----------
     o1 : string
@@ -66,7 +58,6 @@ def hopping_energy(o1, o2, r12, model_parameters):
 	Vector pointing from the 2nd atom to the 1st atom
     model_parameters : dict
 	Dictionary containing all parameters related to the model with energies in hartree, distances in bohr.
-
     Returns
     -------
     ans : float
@@ -98,7 +89,6 @@ def coulomb_energy(o1, o2, r12):
         Type of orbital 2
     r12 : float
         Distance between the two atoms
-
     Returns
     -------
     ans : float
@@ -153,14 +143,12 @@ def calculate_potential_vector(atomic_coordinates, model_parameters):
 
 def calculate_interaction_matrix(atomic_coordinates, model_parameters):
     '''Returns the electron-electron interaction energy matrix for an input list of atomic coordinates.
-
     Parameters
     ----------
     atomic_coordinates : np.array
         An array of atomic coordinates. Size should be of (N * 3) where N is the number of atoms
     model_parameters : dict
 	A dictionary of empirical parameters that are used throughout the code
-
     Returns
     -------
     interaction_matrix : np.array
@@ -191,17 +179,14 @@ def chi_on_atom(o1, o2, o3, model_parameters):
 	  used to represent orbital type for orbital 2
     o3 :  string, should have type 's', 'px', 'py', 'pz'
 	  used to represent orbital type for orbital 3
-
     Returns
     -------
     model_parameters['dipole'] : integer
     
     if the first two orbitals are of the same type, and the 3rd orbital is of p type (px, py, pz),
     then returns 1.0 for the chi tensor value
-
     if the first and 3rd orbitals are of the same type, 3rd orbital is of p type (px, py, pz), and
     2nd orbital is of s type, then returns the value of chi tensor as calculated
-
     if the 2nd and 3rd orbitals are of the same type, 3rd orbital is of p type (px, py, pz), and
     1st orbital is of s type, then returns the value of chi tensor as calculated
    
@@ -218,14 +203,12 @@ def chi_on_atom(o1, o2, o3, model_parameters):
 
 def calculate_chi_tensor(atomic_coordinates, model_parameters):
     '''Returns the chi tensor for an input list of atomic coordinates
-
     Parameters
     ----------
     atomic_coordinates : np.array
         An array of atomic coordinates. Size should be of (N * 3) where N is the number of atoms
     model_parameters : dict
 	A dictionary of empirical parameters that are used throughout the code
-
     Returns
     -------
     chi_tensor : np.array in 3 dimensional
@@ -245,19 +228,16 @@ def calculate_chi_tensor(atomic_coordinates, model_parameters):
 
 def calculate_hamiltonian_matrix(atomic_coordinates, model_parameters):
     '''Returns the 1-body Hamiltonian matrix for an input list of atomic coordinates.
-
     Parameters
     ----------
     atomic_coordinates : np.array
         An array of atomic coordinates. Size should be of (N * 3) where N is the number of atoms
     model_parameters : dict
 	A dictionary of empirical parameters that are used throughout the code
-
     Returns
     -------
     hamiltonian_matrix : np.array
         An array that stores the core Hamiltonian matrix for an input list of atomic coordinates
-
     '''
 
     ndof = len(atomic_coordinates) * orbitals_per_atom
@@ -318,7 +298,6 @@ def calculate_fock_matrix(hamiltonian_matrix, interaction_matrix,
         m by m matrix, where m is the number of orbitals
     chi_tensor: np.array
         (m, m, m) tensor, where m is the number of orbitals
-
     Returns
     -------
     fock_matrix: np.array
@@ -346,7 +325,6 @@ def calculate_density_matrix(fock_matrix):
     ----------
     fock_matrix: np.array
         m by m matrix, same dimension as hamiltonian matrix
-
     Returns
     -------
     density_matrix: np.array
@@ -381,7 +359,6 @@ def scf_cycle(hamiltonian_matrix, interaction_matrix, density_matrix,
         fraction of new density matrix
     convergence_tolerance: float, optional, default value is 1e-4
         threshold for norm of error matrix of density
-
     Returns
     -------
     new_density_matrix: np.array
@@ -405,7 +382,6 @@ def scf_cycle(hamiltonian_matrix, interaction_matrix, density_matrix,
 
 def calculate_energy_scf(hamiltonian_matrix, fock_matrix, density_matrix):
     '''Returns the Hartree-Fock total energy defined by the input Hamiltonian, Fock, & density matrices.
-
     Parameters
     ----------
     hamiltonian_matrix: np.array
@@ -414,7 +390,6 @@ def calculate_energy_scf(hamiltonian_matrix, fock_matrix, density_matrix):
         m by m matrix, same dimension as hamiltonian matrix
     density_matrix: np.array
         m by m matrix, where m is the number of orbitals
-
     Returns
     -------
     energy_scf: float
@@ -426,12 +401,10 @@ def calculate_energy_scf(hamiltonian_matrix, fock_matrix, density_matrix):
 
 def partition_orbitals(fock_matrix):
     '''Returns a list with the occupied/virtual energies & orbitals defined by the input Fock matrix.
-
     Parameters
     ----------
     fock_matrix: np.array
         m by m matrix, same dimension as hamiltonian matrix
-
     Returns
     -------
     occupied_energy: float
@@ -468,7 +441,6 @@ def transform_interaction_tensor(occupied_matrix, virtual_matrix,
         electron-electron interaction energy matrix
     chi_tensor: np.array
         (m, m, m) tensor, where m is the number of orbitals
-
     Returns
     -------
     interaction_tensor: np.array
@@ -488,7 +460,6 @@ def transform_interaction_tensor(occupied_matrix, virtual_matrix,
 
 def calculate_energy_mp2(fock_matrix, interaction_matrix, chi_tensor):
     '''Returns the MP2 contribution to the total energy defined by the input Fock & interaction matrices.
-
     Parameters
     ----------
     fock_matrix: np.array
@@ -498,7 +469,6 @@ def calculate_energy_mp2(fock_matrix, interaction_matrix, chi_tensor):
         electron-electron interaction energy matrix
     chi_tensor: np.array
         (m, m, m) tensor, where m is the number of orbitals
-
     Returns
     -------
     energy_mp2: float
@@ -590,4 +560,3 @@ if __name__ == "__main__":
 
     # Error
     print((energy_mp2 / (energy_scf + energy_ion + energy_mp2) ) * 100)
-  
