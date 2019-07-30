@@ -7,7 +7,10 @@ import qm_project_sss
 import pytest
 import sys
 import numpy as np
+import numpy.testing as npt
 
+"""Tests for NobelGasModel class
+"""
 @pytest.fixture()
 def Ar_gas():
     n = 'Argon'
@@ -20,7 +23,6 @@ def test_qm_project_sss_imported():
 
 def test_create_failure():
     name = 20
-
     with pytest.raises(TypeError):
         helium = qm_project_sss.NobleGasModel(name)
 
@@ -118,21 +120,43 @@ def test_ao_index(atomnum, orb_type, expected_ao_index, Ar_gas):
     assert expected_ao_index == atomorb_index
 
 
+
+"""Tests for HartreeFock class
+"""
 @pytest.fixture()
 def hf_1(Ar_gas):
-
     atomic_coordinates = np.array([[0.0,0.0,0.0], [3.0,4.0,5.0]])
-
     hf1 = qm_project_sss.HartreeFock(atomic_coordinates, Ar_gas)
-
     return hf1
 
 def test_scf_energy(hf_1):
-
     expected_hf_energy = -17.901180746673777
-
     hf_1.scf_cycle()
-
     calculated_hf_energy = hf_1.calculate_energy_ion() + hf_1.calculate_energy_scf()
-
     assert expected_hf_energy == calculated_hf_energy
+
+
+"""Tests for MP2 class
+"""
+@pytest.fixture()
+def MP2_case1(Ar_gas):
+    atomic_coordinates = np.array([[0.0, 0.0, 0.0], [3.0, 4.0, 5.0]])
+    MP2_obj = qm_project_sss.MP2(atomic_coordinates, Ar_gas)
+    return MP2_obj
+
+def test_partition_orbitals(MP2_case1):
+    expected_occupied_energy = [-0.6, -0.6, -0.6, -0.6, -0.6, -0.6]
+    expected_virtual_energy = [5.4, 5.4]
+
+    calculated_occupied_energy = MP2_case1.occupied_energy
+    calculated_virtual_energy = MP2_case1.virtual_energy
+
+    npt.assert_array_almost_equal(calculated_occupied_energy, expected_occupied_energy,decimal=1)
+    npt.assert_array_almost_equal(calculated_virtual_energy, expected_virtual_energy,decimal=1)
+
+# def test_transform_interaction_tensor(MP2_case1):
+
+def test_calculate_energy_mp2(MP2_case1):
+    expected_mp2_correction = -0.0012786819552120972
+    calculated_mp2_correction = MP2_case1.mp2_energy
+    npt.assert_almost_equal(calculated_mp2_correction, expected_mp2_correction)
