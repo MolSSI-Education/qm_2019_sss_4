@@ -1,8 +1,7 @@
 """
 mp2.py
-This packages contains class methods 
-Contains a MP2 class that returns the MP2 contribution to the total energy 
-defined by Fock matrix and interaction matrix from Hartree-Fock calculations
+The qm_project_sss package implements semi-empirical quantum mechanical (SCF+MP2) simulation parameterized to reproduce first-principles QM data using a minimal model.
+This module contains a MP2 class implementing methods that returns the MP2 contribution to the total energy based on input Fock matrix and interaction matrix from Hartree-Fock calculations.
 """
 from .hartree_fock import *
 import numpy as np
@@ -10,8 +9,6 @@ import numpy as np
 class MP2(HartreeFock):
     def __init__(self, atomic_coordinates, gas_model):
         super().__init__(atomic_coordinates, gas_model)
-        # self.partition_orbitals = self.partition_orbitals()
-        # self.transform_interaction_tensor = self.transform_interaction_tensor()
         self.hf_energy = self.calculate_energy_scf()
         self.occupied_energy = self.partition_orbitals()[0]
         self.virtual_energy = self.partition_orbitals()[1]
