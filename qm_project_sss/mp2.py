@@ -7,6 +7,26 @@ from .hartree_fock import *
 import numpy as np
 
 class MP2(HartreeFock):
+    """
+    This class is an implementation of the Møller–Plesset perturbation theory to second order (MP2)
+
+    Attributes
+    ----------
+    hf_energy : float
+        The Hartree-Fock total energy inherited from parent HartreeFock class
+    occupied_energy: float
+        Energy from occupied orbitals
+    virtual_energy: float
+        Energy from unoccupied orbitals
+    occupied_matrix: np.array
+        m by m matrix, where m is the number of occupied orbitals
+    virtual_matrix: np.array
+        m by m matrix, where m is the number of unoccupied orbitals
+    interaction_tensor: np.array
+        a transformed interaction tensor
+    energy_mp2: float
+        The MP2 contribution to the total energy.
+    """
     def __init__(self, atomic_coordinates, gas_model):
         super().__init__(atomic_coordinates, gas_model)
         self.hf_energy = self.calculate_energy_scf()
@@ -16,9 +36,28 @@ class MP2(HartreeFock):
         self.virtual_matrix = self.partition_orbitals()[3]
         self.interaction_tensor = self.transform_interaction_tensor()
         self.mp2_energy = self.calculate_energy_mp2()
-        
+
 
     def partition_orbitals(self):
+        """
+        Returns a list with the occupied/virtual energies & orbitals defined by the input Fock matrix.
+
+        Parameters
+        ----------
+        fock_matrix: np.array
+            m by m matrix, same dimension as hamiltonian matrix
+
+        Returns
+        -------
+        occupied_energy: float
+            Return energy from occupied orbitals
+        virtual_energy: float
+            Return energy from unoccupied orbitals
+        occupied_matrix: np.array
+            Returns a m by m matrix, where m is the number of occupied orbitals
+        virtual_matrix: np.array
+            Returns m by m matrix, where m is the number of unoccupied orbitals
+        """
         num_occ = (self.gas_model.ionic_charge // 2) * np.size(self.fock_matrix,
                                                 0) // self.gas_model.orbitals_per_atom
         orbital_energy, orbital_matrix = np.linalg.eigh(self.fock_matrix)
@@ -30,6 +69,26 @@ class MP2(HartreeFock):
         return occupied_energy, virtual_energy, occupied_matrix, virtual_matrix
 
     def transform_interaction_tensor(self):
+        """
+        Returns a transformed V tensor defined by the input occupied, virtual, & interaction matrices.
+
+        Parameters
+        ----------
+        occupied_matrix: np.array
+            m by m matrix, where m is the number of occupied orbitals
+        virtual_matrix: np.array
+            m by m matrix, where m is the number of unoccupied orbitals
+        interaction_matrix: np.array
+            m by m matrix, where m is the number of orbitals
+            electron-electron interaction energy matrix
+        chi_tensor: np.array
+            (m, m, m) tensor, where m is the number of orbitals
+
+        Returns
+        -------
+        interaction_tensor: np.array
+             Returns a transformed V tensor
+        """
         chi2_tensor = np.einsum('qa,ri,qrp',
                                 self.virtual_matrix,
                                 self.occupied_matrix,
@@ -46,6 +105,25 @@ class MP2(HartreeFock):
         # E_occ, E_virt, occupied_matrix, virtual_matrix = self.partition_orbitals(self.fock_matrix)
         # V_tilde = self.transform_interaction_tensor(self.occupied_matrix, self.virtual_matrix,
         #                                     self.interaction_matrix, self.chi_tensor)
+        """
+        Returns the MP2 contribution to the total energy defined by the input Fock & interaction matrices.
+
+        Parameters
+        ----------
+        fock_matrix: np.array
+            m by m matrix, same dimension as hamiltonian matrix
+        interaction_matrix: np.array
+            m by m matrix, where m is the number of orbitals
+            electron-electron interaction energy matrix
+        chi_tensor: np.array
+            (m, m, m) tensor, where m is the number of orbitals
+
+        Returns
+        -------
+        energy_mp2: float
+            Returns the MP2 contribution to the total energy.
+        """
+
         V_tilde = self.interaction_tensor
 
         energy_mp2 = 0.0
@@ -65,5 +143,5 @@ class MP2(HartreeFock):
                         #     (2.0 * V_tilde[a, i, b, j]**2 -
                         #     V_tilde[a, i, b, j] * V_tilde[a, j, b, i]) /
                         #     (E_virt[a] + E_virt[b] - E_occ[i] - E_occ[j]))
-                        
+
         return energy_mp2

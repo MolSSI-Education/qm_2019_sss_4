@@ -5,44 +5,43 @@ This module contains a NobleGasModel class which has data associated with the no
 """
 
 class NobleGasModel:
+    """ This is a class for the noble gas model with currently supported noble gases: Argon(Ar), Neon(Ne)
+            
+    Attributes
+    ----------
+    model_parameters : dict
+        dictionary of empirical parameters for a specific noble gas.
+    ionic_charge: integer
+        6 for NobleGasModel.
+    orbital_types: list
+        list of orbital types.
+        ['s', 'px', 'py', 'pz']
+    orbitals_per_atom: integer
+        4 for NobleGasModel.
+    p_orbitals: list
+        list of p orbital types.
+        ['px', 'py', 'pz']
+    vec: dict
+        dictionary of direction vectors for different p orbitals.
+        { 'px':[1,0,0], 'py':[0,1,0], 'pz':[0,0,1] }
+    orbital_occupation: dict
+        dictionary of occupation numbers for different orbital type.
+        {'s':0, 'px':1, 'py':1, 'pz':1}
 
-    def __init__(self, gas_type):
-        """ Initialized an instance with a gas_type, gas_type currently supported: Argon(Ar), Neon(Ne)
+    """
+
+    def __init__(self, gas_type): 
+        """
+	Initializes an instance with a gas_type, gas_type currently supported: Argon(Ar), Neon(Ne)
             
         Parameters
         ----------
         gas_type: string
-            string of noble element name, case-insensitive
+            string of noble element name, case-insensitive 
             e.g. 'Argon', 'Ar', 'NEON', 'ne'
 
-        Attributes
-        ----------
-        model_parameters : dict
-            dictionary of empirical parameters for a specific noble gas.
-        ionic_charge: integer
-            6 for NobleGasModel.
-        orbital_types: list
-            list of orbital types.
-            ['s', 'px', 'py', 'pz']
-        orbitals_per_atom: integer
-            4 for NobleGasModel.
-        p_orbitals: list
-            list of p orbital types.
-            ['px', 'py', 'pz']
-        vec: dict
-            dictionary of direction vectors for different p orbitals.
-            { 'px':[1,0,0], 'py':[0,1,0], 'pz':[0,0,1] }
-        orbital_occupation: dict
-            dictionary of occupation numbers for different orbital type.
-            {'s':0, 'px':1, 'py':1, 'pz':1}
-
-        Methods
-        -------
-        ao_index(atom_p, orb_p)
-        atom(ao_index)
-        orb(ao_index)
         """
-      
+	
         if isinstance(gas_type, str):
             self.gas_type = gas_type
         else:
