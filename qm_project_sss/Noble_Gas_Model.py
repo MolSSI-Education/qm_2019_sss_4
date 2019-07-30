@@ -1,7 +1,5 @@
-import numpy as np
-
 # initialized with a gas type
-class Nobel_Gas_Model:
+class NobleGasModel:
     def __init__(self, gas_type):
         """Creates an instance of the class for a given gas type
 
@@ -10,12 +8,9 @@ class Nobel_Gas_Model:
         gas_type : string
             Defines the gas type in the system (out of Ar or Ne)
         """
-
         if isinstance(gas_type, str):
-
             self.gas_type = gas_type
         else:
-
             raise TypeError("Name should be a string!")
 
         if (self.gas_type.lower() == "ar" or self.gas_type.lower() == "argon"):
@@ -51,7 +46,7 @@ class Nobel_Gas_Model:
             }
 
         else:
-            raise TypeError("Gas type cannot be recognized: Ar, Argon, Ne and Neon expected")
+            raise TypeError("Noble Gas Model Not Supported! Ar, Argon, Ne and Neon expected")
 
         self.ionic_charge = 6
 
@@ -68,12 +63,12 @@ class Nobel_Gas_Model:
 
     def ao_index(self, atom_p, orb_p):
         """
-        Returns the atomic orbital index for a given atom index and orbital type
-
+	Returns the index of the atomic orbital based on the index of atom and orbital type
+	
         Parameters
         ----------
         atom_p : integer
-	       The atom number to which the orbital belongs
+	       index of the atom where the orbital centers
         orb_p : string
 	       The type of the orbital out of 's', 'px', 'py', 'pz'
 
@@ -82,9 +77,7 @@ class Nobel_Gas_Model:
         p : integer
 	       The index of the orbital based on the atom number and the orbital type
         """
-
         p = atom_p * self.orbitals_per_atom
-
         p += self.orbital_types.index(orb_p)
 
         return p
@@ -123,5 +116,5 @@ class Nobel_Gas_Model:
         """
 
         orb_index = ao_index % self.orbitals_per_atom
-
-        return self.orbital_types[orb_index]
+        orb_type = self.orbital_types[orb_index]
+        return orb_type

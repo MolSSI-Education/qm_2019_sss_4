@@ -1,8 +1,7 @@
 """
 hartree_fock.py
 This package implements semi-empirical quantum mechanical (SCF+MP2) simulation parameterized to reproduce first-principles QM data using a minimal model.
-
-Handles the primary functions
+Contains a HartreeFock class which performs atomic SCF calculations.
 """
 import numpy as np
 
@@ -23,9 +22,9 @@ class HartreeFock:
         self.gas_model = gas_model
 
         self.ndof = len(self.atomic_coordinates) * self.gas_model.orbitals_per_atom
-
+        
         self.chi_tensor = self.calculate_chi_tensor()
-
+        #
         self.potential_vector = self.calculate_potential_vector()
 
         self.interaction_matrix = self.calculate_interaction_matrix()
@@ -36,6 +35,7 @@ class HartreeFock:
 
         self.fock_matrix = self.calculate_fock_matrix(self.density_matrix)
 
+        # self.energy_scf = self.calculate_energy_scf()
 
     def hopping_energy(self, o1, o2, r12):
         """
@@ -165,7 +165,7 @@ class HartreeFock:
     def calculate_potential_vector(self):
         """Returns the electron-ion potential energy vector for an input list of atomic coordinates"""
 
-        self.potential_vector = np.zeros(self.ndof)
+        potential_vector = np.zeros(self.ndof)
 
         for p in range(self.ndof):
 
@@ -175,10 +175,10 @@ class HartreeFock:
 
                 if atom_i != self.gas_model.atom(p):
 
-                    self.potential_vector[p] += ( self.pseudopotential_energy(self.gas_model.orb(p), r_pi) -
+                    potential_vector[p] += ( self.pseudopotential_energy(self.gas_model.orb(p), r_pi) -
                                         self.gas_model.ionic_charge * self.coulomb_energy(self.gas_model.orb(p), 's', r_pi) )
 
-        return self.potential_vector
+        return potential_vector
 
 
     def calculate_interaction_matrix(self):
@@ -315,7 +315,8 @@ class HartreeFock:
 
         hamiltonian_matrix = np.zeros( (self.ndof, self.ndof) )
 
-        potential_vector = self.calculate_potential_vector()
+        # potential_vector = self.calculate_potential_vector()
+        # potential_vector = self.potential_vector
 
         for p in range(self.ndof):
 
