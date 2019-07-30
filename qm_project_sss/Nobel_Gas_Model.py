@@ -2,10 +2,14 @@ import numpy as np
 
 # initialized with a gas type
 class Nobel_Gas_Model:
-
     def __init__(self, gas_type):
+        """Creates an instance of the class for a given gas type
 
-        """model_parameters : a dictionary of parameters"""
+        Parameters
+        ----------
+        gas_type : string
+            Defines the gas type in the system (out of Ar or Ne)
+        """
 
         if isinstance(gas_type, str):
 
@@ -63,6 +67,21 @@ class Nobel_Gas_Model:
 
 
     def ao_index(self, atom_p, orb_p):
+        """
+        Returns the atomic orbital index for a given atom index and orbital type
+
+        Parameters
+        ----------
+        atom_p : integer
+	       The atom number to which the orbital belongs
+        orb_p : string
+	       The type of the orbital out of 's', 'px', 'py', 'pz'
+
+        Returns
+        -------
+        p : integer
+	       The index of the orbital based on the atom number and the orbital type
+        """
 
         p = atom_p * self.orbitals_per_atom
 
@@ -71,11 +90,37 @@ class Nobel_Gas_Model:
         return p
 
     def atom(self, ao_index):
+        """
+        Returns the atom index part of an atomic orbital index
+
+        Parameters
+        ----------
+        ao_index : integer
+	       It is the index assigned to a particular orbital in the system
+
+        Returns
+        -------
+        atom_num : integer
+	       The atom number to which the orbital associated with the given atomic index belongs
+        """
 
         return ao_index // self.orbitals_per_atom
 
 
     def orb(self, ao_index):
+        """
+        Returns the orbital type of an atomic orbital index
+
+        Parameters
+        ----------
+        ao_index : integer
+	       It is the index assigned to a particular orbital in the system
+
+        Returns
+        -------
+        orbital_type : string
+    	   It returns the type of the orbital based on the atomic index as a string out of 's', 'px', 'py', 'pz'
+        """
 
         orb_index = ao_index % self.orbitals_per_atom
 

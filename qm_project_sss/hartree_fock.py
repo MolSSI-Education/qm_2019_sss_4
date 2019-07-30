@@ -8,6 +8,16 @@ import numpy as np
 
 class HartreeFock:
     def __init__(self, atomic_coordinates, gas_model):
+        """Creates an instance of the class for the given system to apply HF theory
+
+        Parameters
+        ----------
+        atomic_coordinates : Numpy array
+            The array of the coordinates of all the atoms in the system
+        gas_model : object of the class Nobel_Gas_Model
+            This is an object of the class Nobel_Gas_Model for a given gas type
+        """
+
         self.atomic_coordinates = atomic_coordinates
 
         self.gas_model = gas_model
@@ -28,6 +38,27 @@ class HartreeFock:
 
 
     def hopping_energy(self, o1, o2, r12):
+        """
+        Returns the hopping matrix element for a pair of orbitals of type o1 & o2 separated by a vector r12
+
+        Parameters
+        ----------
+        o1 : string
+	       Orbital type 1. Takes orbital type as an input as one out of 's', 'px', 'py', 'pz'
+        o2 : string
+	       Orbital type 2. Takes orbital type as an input as one out of 's', 'px', 'py', 'pz'
+        o3 : string
+	       Orbital type 3. Takes orbital type as an input as one out of 's', 'px', 'py', 'pz'
+        r12 : numpy array
+	       Vector pointing from the 2nd atom to the 1st atom
+        model_parameters : dict
+	       Dictionary containing all parameters related to the model with energies in hartree, distances in bohr.
+
+        Returns
+        -------
+        ans : float
+	       Returns the hopping energy based on the orbtial types for the frist and second atom
+        """
         r12_rescaled = r12 / self.gas_model.model_parameters['r_hop']
 
         r12_length = np.linalg.norm(r12_rescaled)
@@ -56,6 +87,22 @@ class HartreeFock:
 
 
     def coulomb_energy(self, o1, o2, r12):
+        """
+        Returns the Coulomb matrix element for a pair of multipoles of type o1 & o2 separated by a vector r12.
+
+        Parameters
+        ----------
+        o1 : str
+            Type of orbital 1
+        o2 : str
+            Type of orbital 2
+        r12 : float
+            Distance between the two atoms
+        Returns
+        -------
+        ans : float
+            returns the coulomb matrix element
+        """
 
         r12_length = np.linalg.norm(r12)
 
@@ -82,6 +129,9 @@ class HartreeFock:
 
 
     def pseudopotential_energy(self, o, r):
+        """
+        Returns the energy of a pseudopotential between a multipole of type o and an atom separated by a vector r
+        """
 
         r_rescaled = r / self.gas_model.model_parameters['r_pseudo']
 
@@ -97,6 +147,7 @@ class HartreeFock:
 
 
     def calculate_energy_ion(self):
+        """Returns the ionic contribution to the total energy for an input list of atomic coordinates"""
 
         energy_ion = 0.0
 
@@ -112,6 +163,7 @@ class HartreeFock:
 
 
     def calculate_potential_vector(self):
+        """Returns the electron-ion potential energy vector for an input list of atomic coordinates"""
 
         self.potential_vector = np.zeros(self.ndof)
 
@@ -130,6 +182,21 @@ class HartreeFock:
 
 
     def calculate_interaction_matrix(self):
+        """Returns the electron-electron interaction energy matrix for an input list of atomic coordinates.
+
+        Parameters
+        ----------
+            atomic_coordinates : np.array
+        An array of atomic coordinates. Size should be of (N * 3) where N is the number of atoms
+        model_parameters : dict
+	       A dictionary of empirical parameters that are used throughout the code
+
+        Returns
+        -------
+        interaction_matrix : np.array
+
+        An array of coefficients that describes the interaction between electrons
+        """
 
         interaction_matrix = np.zeros ((self.ndof,self.ndof))
 
@@ -155,6 +222,30 @@ class HartreeFock:
 
 
     def chi_on_atom(self, o1, o2, o3):
+        """
+        Returns the value of the chi tensor for 3 orbital indices on the same atom.
+
+        Parameters
+        ----------
+        o1 :  string, should have type 's', 'px', 'py', 'pz'
+	       used to represent orbital type for orbital 1
+        o2 :  string, should have type 's', 'px', 'py', 'pz'
+	       used to represent orbital type for orbital 2
+        o3 :  string, should have type 's', 'px', 'py', 'pz'
+	       used to represent orbital type for orbital 3
+
+        Returns
+        -------
+        model_parameters['dipole'] : integer
+
+            if the first two orbitals are of the same type, and the 3rd orbital is of p type (px, py, pz),
+                then returns 1.0 for the chi tensor value
+            if the first and 3rd orbitals are of the same type, 3rd orbital is of p type (px, py, pz), and
+                2nd orbital is of s type, then returns the value of chi tensor as calculated
+            if the 2nd and 3rd orbitals are of the same type, 3rd orbital is of p type (px, py, pz), and
+                1st orbital is of s type, then returns the value of chi tensor as calculated
+            otherwise, returns 0.0 as the chi tensor value
+        """
 
         if o1 == o2 and o3 =='s':
 
@@ -172,6 +263,21 @@ class HartreeFock:
 
 
     def calculate_chi_tensor(self):
+        """
+        Returns the chi tensor for an input list of atomic coordinates
+
+        Parameters
+        ----------
+        atomic_coordinates : np.array
+            An array of atomic coordinates. Size should be of (N * 3) where N is the number of atoms
+        model_parameters : dict
+	       A dictionary of empirical parameters that are used throughout the code
+
+        Returns
+        -------
+        chi_tensor : np.array in 3 dimensional
+            An array that stores the values of chi tensor for an input list of atomic coordinates
+        """
 
         chi_tensor = np.zeros( (self.ndof, self.ndof, self.ndof) )
 
@@ -191,6 +297,21 @@ class HartreeFock:
 
 
     def calculate_hamiltonian_matrix(self):
+        """
+        Returns the 1-body Hamiltonian matrix for an input list of atomic coordinates.
+
+        Parameters
+        ----------
+        atomic_coordinates : np.array
+            An array of atomic coordinates. Size should be of (N * 3) where N is the number of atoms
+        model_parameters : dict
+	        A dictionary of empirical parameters that are used throughout the code
+
+        Returns
+        -------
+        hamiltonian_matrix : np.array
+            An array that stores the core Hamiltonian matrix for an input list of atomic coordinates
+        """
 
         hamiltonian_matrix = np.zeros( (self.ndof, self.ndof) )
 
@@ -227,6 +348,20 @@ class HartreeFock:
 
 
     def calculate_atomic_density_matrix(self):
+        """
+        Returns a trial 1-electron density matrix based on atomic coordinates.
+
+        Parameters
+        ----------
+        atomic_coordinates: np.array or list
+            An array/list of atomic coordinates.
+            e.g. atomic_coordinates = np.array([[0.0, 0.0, 0.0], [3.0, 4.0, 5.0]])
+
+        Returns
+        -------
+        density_matrix: np.array
+            m by m diagonal matrix, where m is the number of orbitals
+        """
 
         density_matrix = np.zeros( (self.ndof, self.ndof) )
 
@@ -238,6 +373,26 @@ class HartreeFock:
 
 
     def calculate_fock_matrix(self, old_density_matrix):
+        """
+        Returns the Fock matrix defined by the input Hamiltonian, interaction, & density matrices.
+
+        Parameters
+        ----------
+        hamiltonian_matrix: np.array
+            m by m matrix, where m is the number of orbitals
+        interaction_matrix: np.array
+            m by m matrix, where m is the number of orbitals
+            electron-electron interaction energy matrix
+        density_matrix: np.array
+            m by m matrix, where m is the number of orbitals
+        chi_tensor: np.array
+            (m, m, m) tensor, where m is the number of orbitals
+
+        Returns
+        -------
+        fock_matrix: np.array
+            m by m matrix
+        """
 
         fock_matrix = self.hamiltonian_matrix.copy()
 
@@ -249,7 +404,19 @@ class HartreeFock:
 
 
     def calculate_density_matrix(self):
+        """
+        Returns the 1-electron density matrix defined by the input Fock matrix.
 
+        Parameters
+        ----------
+        fock_matrix: np.array
+            m by m matrix, same dimension as hamiltonian matrix
+
+        Returns
+        -------
+        density_matrix: np.array
+            m by m matrix, updated density matrix
+        """
         num_occ = (self.gas_model.ionic_charge//2) * np.size(self.fock_matrix,0) // self.gas_model.orbitals_per_atom
 
         orbital_energy, orbital_matrix = np.linalg.eigh(self.fock_matrix)
@@ -262,6 +429,34 @@ class HartreeFock:
 
 
     def scf_cycle( self, max_scf_iterations = 100, mixing_fraction = 0.25, convergence_tolerance = 1e-10):
+        """
+        Returns converged density & Fock matrices defined by the input Hamiltonian, interaction, & density matrices.
+
+        Parameters
+        ----------
+        hamiltonian_matrix: np.array
+            m by m matrix, where m is the number of orbitals
+        interaction_matrix: np.array
+            m by m matrix, where m is the number of orbitals
+            electron-electron interaction energy matrix
+        density_matrix: np.array
+            m by m matrix, where m is the number of orbitals
+        chi_tensor: np.array
+            (m, m, m) tensor, where m is the number of orbitals
+        max_scf_iterations: integer, optional, default value is 100
+            maximum number of scf iterations allowed
+        mixing_fraction: float, optional, default value is 0.25
+            fraction of new density matrix
+        convergence_tolerance: float, optional, default value is 1e-4
+            threshold for norm of error matrix of density
+
+        Returns
+        -------
+        new_density_matrix: np.array
+            m by m matrix, where m is the number of orbitals
+        new_fock_matrix: np.array
+            m by m matrix, where m is the number of orbitals
+        """
 
         self.density_matrix = self.calculate_density_matrix()
 
@@ -289,7 +484,23 @@ class HartreeFock:
 
 
     def calculate_energy_scf(self):
+        """
+        Returns the Hartree-Fock total energy defined by the input Hamiltonian, Fock, & density matrices.
 
+        Parameters
+        ----------
+        hamiltonian_matrix: np.array
+            m by m matrix, where m is the number of orbitals
+        fock_matrix: np.array
+            m by m matrix, same dimension as hamiltonian matrix
+        density_matrix: np.array
+            m by m matrix, where m is the number of orbitals
+
+        Returns
+        -------
+        energy_scf: float
+            Returns the Hartree-Fock total energy
+        """
         energy_scf = np.einsum('pq,pq', self.hamiltonian_matrix + self.fock_matrix, self.density_matrix)
 
         return energy_scf
