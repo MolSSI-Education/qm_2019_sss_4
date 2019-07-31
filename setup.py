@@ -24,7 +24,7 @@ except:
 # Build our C++ module
 # NOTE: Pybind11/Eigen were installed into CONDA_PREFIX
 #       so we need to add that to the include paths
-conda_prefix = os.environ["CONDA_PREFIX"]
+conda_prefix = os.environ['CONDA_PREFIX']
 eigen_path = os.path.join(conda_prefix, 'include', 'eigen3')
 
 # MacOSX causes some problems. This is due to a recent
