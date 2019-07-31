@@ -4,7 +4,7 @@ The qm_project_sss package implements semi-empirical quantum mechanical (SCF+MP2
 This module contains a HartreeFock class which performs atomic SCF calculations.
 """
 import numpy as np
-
+from timeit import default_timer as timer
 class HartreeFock:
     """
     This is a class to implement the Hartree Fock theory
@@ -563,7 +563,7 @@ class HartreeFock:
         new_fock_matrix: np.array
             m by m matrix, where m is the number of orbitals
         """
-
+        time1 = timer()
         self.density_matrix = self.calculate_density_matrix()
 
         old_density_matrix = self.density_matrix.copy()
@@ -581,12 +581,17 @@ class HartreeFock:
 
             if error_norm < convergence_tolerance:
                 print(self.iter_error)
+                time2 = timer()
+                time_elapsed = time2 - time1
+                print('\nTime elapsed : ' + str(time_elapsed) + ' seconds \n')
                 return self.density_matrix, self.fock_matrix
 
             old_density_matrix = (mixing_fraction * self.density_matrix + (1-mixing_fraction) * old_density_matrix )
-
+	
         print("Warning: SCF Cycle did not converge")
-
+        time2 = timer()
+        time_elapsed = time2 - time1
+        print('\nTime elapsed : ' + str(time_elapsed) + ' seconds \n')
         return self.density_matrix, self.fock_matrix
 
 
