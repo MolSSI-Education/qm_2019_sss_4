@@ -41,14 +41,14 @@ Ar = NobleGasModel('ar')
 atomic_coordinates = np.array([[0.0,0.0,0.0], [3.0,4.0,5.0]])
 
 # Initilize a HartreeFock object
-hf = qm_project_sss.HartreeFock(atomic_coordinates, Ar)
+hf = HartreeFock(atomic_coordinates, Ar)
 
 # Start SCF iterations
 hf.scf_cycle()
 hf_energy = hf.calculate_energy_ion() + hf.calculate_energy_scf()
 
 # Compute MP2 correction to HF energy
-mp2 = qm_project_sss.MP2(atomic_coordinates, Ar)
+mp2 = MP2(atomic_coordinates, Ar)
 mp2_correction = mp2.mp2_energy
 ```
 
