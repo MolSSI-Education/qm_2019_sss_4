@@ -30,6 +30,7 @@ class HartreeFock:
     fock_matrix: np.array
         m by m matrix, containing the fock elements
     iter_error: dict
+        dictionary which stores error norm of density matrix for each iteration until convergence
         key: int, iteration index; value: float, error norm of density matrix
 
     """
