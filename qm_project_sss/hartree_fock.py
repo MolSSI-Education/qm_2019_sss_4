@@ -11,7 +11,7 @@ class HartreeFock:
 
     Attributes
     ----------
-    atomic_coordinates : Numpy array
+    atomic_coordinates : numpy array
         The array of the coordinates of all the atoms in the system
     gas_model : object of the class Nobel_Gas_Model
         This is an object of the class Nobel_Gas_Model for a given gas type
@@ -29,6 +29,9 @@ class HartreeFock:
         m by m matrix, updated density matrix
     fock_matrix: np.array
         m by m matrix, containing the fock elements
+    iter_error: dict
+        dictionary which stores error norm of density matrix for each iteration until convergence
+        key: int, iteration index; value: float, error norm of density matrix
 
     """
 
@@ -73,6 +76,8 @@ class HartreeFock:
         self.hamiltonian_matrix = self.calculate_hamiltonian_matrix()
 
         self.fock_matrix = self.calculate_fock_matrix(self.density_matrix)
+
+        self.iter_error = {}
 
         # self.energy_scf = self.calculate_energy_scf()
 
@@ -480,6 +485,7 @@ class HartreeFock:
                                     for orb_u in self.gas_model.orbital_types:
                                         u = self.gas_model.ao_index(self.gas_model.atom(r),
                                                                     orb_u)  # r & u on same atom
+                                                                      
 
                                         chi_rsu = self.chi_on_atom(self.gas_model.orb(r), orb_s, orb_u)
 
@@ -570,10 +576,11 @@ class HartreeFock:
 
             error_norm = np.linalg.norm( old_density_matrix - self.density_matrix)
 
+            self.iter_error[iteration] = error_norm
             # print(iteration, error_norm)
 
             if error_norm < convergence_tolerance:
-
+                print(self.iter_error)
                 return self.density_matrix, self.fock_matrix
 
             old_density_matrix = (mixing_fraction * self.density_matrix + (1-mixing_fraction) * old_density_matrix )
