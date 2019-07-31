@@ -6,7 +6,6 @@ dependencies:
   - pip
 
     # Testing
-  - numpy
 
     # Pip-only installs
   #- pip:
