@@ -40,8 +40,17 @@ import numpy as np
 Ar = NobleGasModel('ar')
 atomic_coordinates = np.array([[0.0,0.0,0.0], [3.0,4.0,5.0]])
 
+
 # Initilize a HartreeFock object
+# 1. default 'slow' algorithm for fock matrix calculation
 hf = HartreeFock(atomic_coordinates, Ar)
+
+# Alternatively, 2. 'fast' algorithm (python) for fock matrix calculation
+hf_fast = HartreeFock(atomic_coordinates, Ar, fock_mode = 'fast', use_cpp_module = False)
+
+# Alternatively, 3. 'fast' algorithm (cpp) for fock matrix calculation
+hf_fast_cpp = HartreeFock(atomic_coordinates, Ar, fock_mode = 'fast', use_cpp_module = True)
+
 
 # Start SCF iterations
 hf.scf_cycle()
