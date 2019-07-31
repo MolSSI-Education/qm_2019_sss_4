@@ -148,6 +148,7 @@ def test_scf_energy_fast(hf_fock_fast):
     calculated_hf_energy = hf_fock_fast.calculate_energy_ion() + hf_fock_fast.calculate_energy_scf()
     assert pytest.approx(expected_hf_energy) == calculated_hf_energy
 
+
 @pytest.fixture()
 def hf_fock_fast_cpp(Ar_gas):
     atomic_coordinates = np.array([[0.0, 0.0, 0.0], [3.0, 4.0, 5.0]])
@@ -156,7 +157,8 @@ def hf_fock_fast_cpp(Ar_gas):
 
 
 def test_scf_energy_fast_cpp(hf_fock_fast_cpp):
-    expected_hf_energy = -17.901180746673777
+    # expected_hf_energy = -17.901180746673777
+    expected_hf_energy = -18.01262
     hf_fock_fast_cpp.scf_cycle()
     calculated_hf_energy = hf_fock_fast_cpp.calculate_energy_ion() + hf_fock_fast_cpp.calculate_energy_scf()
     assert pytest.approx(expected_hf_energy) == calculated_hf_energy
