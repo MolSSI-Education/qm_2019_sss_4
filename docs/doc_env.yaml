@@ -1,11 +1,12 @@
-name: dependencies
+name: documentation
 channels:
 dependencies:
     # Base depends
   - python
   - pip
 
-    # Testing
+    # Dependecies
+    - numpy
 
     # Pip-only installs
   #- pip:
