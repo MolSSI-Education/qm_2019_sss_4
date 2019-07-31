@@ -5,6 +5,8 @@ This module contains a HartreeFock class which performs atomic SCF calculations.
 """
 import numpy as np
 from timeit import default_timer as timer
+from qm_project_sss.hf_C import fock_matrix_rewrite
+
 class HartreeFock:
     """
     This is a class to implement the Hartree Fock theory
@@ -467,7 +469,7 @@ class HartreeFock:
 
             if self.use_cpp_module:
               
-                from qm_project_sss.hf_C import fock_matrix_rewrite
+                # from qm_project_sss.hf_C import fock_matrix_rewrite
                 dipole = self.gas_model.model_parameters['dipole']
                 fock_matrix = fock_matrix_rewrite(self.hamiltonian_matrix, self.density_matrix, self.interaction_matrix, dipole)
             
