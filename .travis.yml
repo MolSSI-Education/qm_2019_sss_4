@@ -45,15 +45,12 @@ install:
 
 script:
         #  - pytest -v --cov=qm_2019_sss_4/ /qm_project_sss/tests/
-  - pytest -v --cov=qm_2019_sss_4/ 
+  - pytest -v --cov=qm_project_sss qm_project_sss/tests/
+
 
 notifications:
     email: false
 
 after_success:
   - codecov
-
-<<<<<<< HEAD
-
-=======
->>>>>>> 265062447bdeef9596f7942c892d0eab35e38d2b
+  
