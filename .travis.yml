@@ -40,12 +40,14 @@ install:
     # Build and install package
   - conda install -c conda-forge eigen
   - conda install -c conda-forge pybind11
+  - conda install numpy
+
   - python setup.py develop --no-deps
 
 
 script:
         #  - pytest -v --cov=qm_2019_sss_4/ /qm_project_sss/tests/
-  - pytest -v --cov=qm_2019_sss_4/ 
+  - pytest -v --cov=qm_project_sss qm_project_sss/tests/
 
 notifications:
     email: false
@@ -53,7 +55,5 @@ notifications:
 after_success:
   - codecov
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 265062447bdeef9596f7942c892d0eab35e38d2b
+
